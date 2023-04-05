@@ -60,7 +60,6 @@ export class GameState extends EventEmitter {
     }
 
     static #calculateScore(burntAmount) {
-        // todo: see blast mechanics bestpractice
         return burntAmount;
     }
 
@@ -105,7 +104,6 @@ export class GameState extends EventEmitter {
     }
 
     #randomColor() {
-        // Math.ceil here is > 0, so 0 can be used for empty cell
         return Math.ceil(Math.random() * this.#colorsAmount);
     }
 
