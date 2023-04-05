@@ -26,7 +26,6 @@ export class TexturesLoader extends EventEmitter {
                             const texture = Texture.from(resolvedPath);
                             textures.push(texture);
                             resolve();
-                            // texture.on('loaded', resolve);
                         }
                     );
                 });
