@@ -8,9 +8,9 @@ import * as PIXI from 'pixi.js';
 const options = {
     n: 11,
     m: 9,
-    colorsAmount: 5,
-    minGroupSizeLimit: 2,
-    pointsGoal: 10,
+    tilesAmount: 5,
+    minGroupSizeLimit: 10,
+    pointsGoal: 40,
     movesLimit: 10,
     shufflesLimit: 10
 };
