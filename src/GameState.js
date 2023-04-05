@@ -3,7 +3,7 @@ import EventEmitter from 'events';
 export class GameState extends EventEmitter {
     #rows;
     #cols;
-    #colorsAmount;
+    #tilesAmount;
     #minGroupSizeLimit;
     #pointsGoal;
     #movesLimit;
@@ -16,7 +16,7 @@ export class GameState extends EventEmitter {
     constructor({
         n,
         m,
-        colorsAmount,
+        tilesAmount,
         minGroupSizeLimit,
         pointsGoal,
         movesLimit,
@@ -25,7 +25,7 @@ export class GameState extends EventEmitter {
         super();
         this.#rows = n;
         this.#cols = m;
-        this.#colorsAmount = colorsAmount;
+        this.#tilesAmount = tilesAmount;
         this.#minGroupSizeLimit = minGroupSizeLimit;
         this.#pointsGoal = pointsGoal;
         this.#movesLimit = movesLimit;
@@ -64,13 +64,24 @@ export class GameState extends EventEmitter {
     }
 
     clickTile(row, col) {
-        const group = this.#getGroup(row, col);
-        if (group.length >= this.#minGroupSizeLimit) {
+        let group;
+        console.log(this.#tiles[row][col]);
+        if (this.#tiles[row][col] === 0) {
+            const radius = Math.round(Math.min(this.#rows, this.#cols) / 4);
+            group = this.#getSurroundingGroup(row, col, radius);
+        } else {
+            group = this.#getGroup(row, col);
+        }
+        if (
+            group.length >= this.#minGroupSizeLimit ||
+            this.#tiles[row][col] === 0
+        ) {
             this.#handleMove(group);
             this.#checkGameOver();
         } else if (!this.#hasPossibleMoves()) {
             if (this.#shufflesAmount < this.#shufflesLimit) {
                 this.#shuffleTiles();
+                this.emit('syncTiles', this.#tiles);
             } else {
                 return this.emit('lose', this.#pointsGoal - this.#score);
             }
@@ -84,7 +95,7 @@ export class GameState extends EventEmitter {
         for (let i = 0; i !== this.#rows; i++) {
             this.#tiles.push([]);
             for (let j = 0; j !== this.#cols; j++) {
-                this.#tiles[i].push(this.#randomColor());
+                this.#tiles[i].push(this.#randomTile());
             }
         }
         this.emit('syncTiles', this.#tiles);
@@ -103,8 +114,28 @@ export class GameState extends EventEmitter {
         this.emit('syncTiles', this.#tiles);
     }
 
-    #randomColor() {
-        return Math.ceil(Math.random() * this.#colorsAmount);
+    #getSurroundingGroup(row, col, radius) {
+        const group = [];
+        for (let i = row - radius; i <= row + radius; i++) {
+            if (i >= 0 && i < this.#tiles.length) {
+                for (let j = col - radius; j <= col + radius; j++) {
+                    if (j >= 0 && j < this.#tiles[i].length) {
+                        const dx = i - row;
+                        const dy = j - col;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance <= radius) {
+                            group.push({ row: i, col: j });
+                        }
+                    }
+                }
+            }
+        }
+        return group;
+    }
+
+    #randomTile() {
+        if (Math.random() < 0.01) return 0;
+        return Math.ceil(Math.random() * this.#tilesAmount);
     }
 
     #handleMove(group) {
@@ -178,7 +209,7 @@ export class GameState extends EventEmitter {
     #burnTiles(group) {
         for (let i = 0; i !== group.length; i++) {
             const { row, col } = group[i];
-            this.#tiles[row][col] = 0;
+            this.#tiles[row][col] = -1;
         }
     }
 
@@ -193,7 +224,7 @@ export class GameState extends EventEmitter {
                     0;
                 while (start > topLimit) {
                     this.#tiles[end][col] = this.#tiles[start - 1][col];
-                    this.#tiles[start - 1][col] = 0;
+                    this.#tiles[start - 1][col] = -1;
                     start--;
                     end--;
                 }
@@ -208,8 +239,8 @@ export class GameState extends EventEmitter {
         for (let j of cols) {
             j = +j;
             for (let i = 0; i !== this.#rows; i++) {
-                if (this.#tiles[i][j] !== 0) break;
-                this.#tiles[i][j] = this.#randomColor();
+                if (this.#tiles[i][j] !== -1) break;
+                this.#tiles[i][j] = this.#randomTile();
                 filledTiles.push({ x: i, y: j });
             }
         }

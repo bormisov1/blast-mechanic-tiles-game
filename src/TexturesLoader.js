@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import { Texture } from 'pixi.js';
 
 import statsPath from '../assets/stats.png';
+import bombPath from '../assets/bomb.png';
 
 const tileImagesFilenames = require
     .context('../assets/tiles', true, /\.png$/)
@@ -36,5 +37,9 @@ export class TexturesLoader extends EventEmitter {
 
     loadStatsTexture() {
         return Texture.from(statsPath);
+    }
+
+    loadBombTexture() {
+        return Texture.from(bombPath);
     }
 }

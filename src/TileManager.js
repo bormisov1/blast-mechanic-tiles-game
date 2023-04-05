@@ -27,6 +27,7 @@ export class TileManager {
     }
 
     #handleClick({ x, y }) {
+        console.log(x, y, y / this.#tileSize, x / this.#tileSize);
         this.#state.clickTile(
             Math.floor(y / this.#tileSize),
             Math.floor(x / this.#tileSize)
@@ -79,6 +80,7 @@ export class TileManager {
     #makeSprite(tile, x, y) {
         const sprite = new PIXI.Sprite(this.#ui.getTextureFor(tile));
         sprite.anchor.set(0.5);
+        if (tile === 0) sprite.anchor.set(0.4, 0.45);
         const position = new PIXI.Point(
             this.#tileSize * (0.5 + y),
             this.#tileSize * (0.5 + x)

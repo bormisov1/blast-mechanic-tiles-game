@@ -62,7 +62,7 @@ export class UI extends EventEmitter {
     }
 
     getTextureFor(tile) {
-        return this.#tilesTextures[tile - 1];
+        return this.#tilesTextures[tile];
     }
 
     addTileSprites(sprites) {
@@ -81,8 +81,9 @@ export class UI extends EventEmitter {
     #makeTilesContainer(callback) {
         this.#tilesContainer = new Container();
         this.#tilesContainer.interactive = true;
+        const bombTexture = this.#texturesLoader.loadBombTexture();
         this.#texturesLoader.on('loadedTilesTextures', (textures) => {
-            this.#tilesTextures = textures;
+            this.#tilesTextures = [bombTexture, ...textures];
             callback();
         });
         this.#texturesLoader.loadTilesTextures();
@@ -132,9 +133,9 @@ export class UI extends EventEmitter {
 
     #makeGameOverContainer() {
         const container = new Container();
-        this.#gameOverLabel = new Text("Let's go ла-ла-ла-ла", {
+        this.#gameOverLabel = new Text('Tap to start!', {
             fontFamily: 'Arial',
-            fontSize: 50,
+            fontSize: 60,
             fontWeight: 900,
             fill: 0xffffff,
             align: 'center'
@@ -162,7 +163,7 @@ export class UI extends EventEmitter {
         this.#gameOverContainer.visible = true;
         this.#gameOverContainer.interactive = true;
         this.#gameOverLabel.text = hasWon
-            ? `Вы победили набрав ${points} очков`
-            : `Вы проиграли, не хватило ${points} очков`;
+            ? `Вы победили. Ваш score: ${points}`
+            : `Вы проиграли. Не хватило score: ${points}`;
     }
 }
