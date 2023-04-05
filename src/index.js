@@ -9,7 +9,7 @@ const options = {
     n: 11,
     m: 9,
     tilesAmount: 5,
-    minGroupSizeLimit: 10,
+    minGroupSizeLimit: 2,
     pointsGoal: 40,
     movesLimit: 10,
     shufflesLimit: 10
